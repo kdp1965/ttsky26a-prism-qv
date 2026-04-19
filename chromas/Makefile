@@ -4,7 +4,8 @@ TOPDIR = $(shell pwd)
 
 YOSYS_DIR ?= ../../yosys-prism
 YOSYS := $(YOSYS_DIR)/yosys
-CFG := $(TOPDIR)/tinyqv_lut3.cfg
+#CFG := $(TOPDIR)/tinyqv_lut3.cfg
+CFG := $(TOPDIR)/tinyqv16.cfg
 
 CHROMAS := $(basename $(notdir $(wildcard chroma*.v)))
 

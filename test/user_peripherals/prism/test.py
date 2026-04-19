@@ -190,7 +190,7 @@ async def test_project(dut):
         assert await tqv.read_word_reg(0x0) == 0x00000000
 
         # Now load the chroma
-        for i in range(8):
+        for i in range(16):
           # Load MSB of the control word first
           await tqv.write_word_reg(0x14, chroma[i * 2])
         
@@ -237,7 +237,7 @@ async def test_project(dut):
         dut._log.info(f"    Testing if PRISM halted at breakpoint")
         dbg_status = await tqv.read_word_reg(0x0C)
         assert (dbg_status & 3) == 3
-        assert (dbg_status & 0x40) == 0x40
+        assert (dbg_status & 0x100) == 0x100
 
         # Issue a single step request
         dut._log.info(f"    Single stepping PRISM")
@@ -433,29 +433,30 @@ async def test_project(dut):
     # Test register write and read back
     # Write a value to the config array 
     dut._log.info("Testing PRISM state information integrity")
-    await tqv.write_word_reg(0x14, 0x00001010)
-    await tqv.write_word_reg(0x10, 0x10101010)
-
-    await tqv.write_word_reg(0x14, 0x00002020)
-    await tqv.write_word_reg(0x10, 0x20202020)
-
-    await tqv.write_word_reg(0x14, 0x00003030)
-    await tqv.write_word_reg(0x10, 0x30303030)
-
-    await tqv.write_word_reg(0x14, 0x00004040)
-    await tqv.write_word_reg(0x10, 0x40404040)
-
-    await tqv.write_word_reg(0x14, 0x00005050)
-    await tqv.write_word_reg(0x10, 0x50505050)
-
-    await tqv.write_word_reg(0x14, 0x00006060)
-    await tqv.write_word_reg(0x10, 0x60606060)
-
-    await tqv.write_word_reg(0x14, 0x00007070)
-    await tqv.write_word_reg(0x10, 0x70707070)
-
-    await tqv.write_word_reg(0x14, 0x00008080)
-    await tqv.write_word_reg(0x10, 0x80808080)
+    for i in range(2):
+        await tqv.write_word_reg(0x14, 0x00001010)
+        await tqv.write_word_reg(0x10, 0x10101010)
+        
+        await tqv.write_word_reg(0x14, 0x00002020)
+        await tqv.write_word_reg(0x10, 0x20202020)
+        
+        await tqv.write_word_reg(0x14, 0x00003030)
+        await tqv.write_word_reg(0x10, 0x30303030)
+        
+        await tqv.write_word_reg(0x14, 0x00004040)
+        await tqv.write_word_reg(0x10, 0x40404040)
+        
+        await tqv.write_word_reg(0x14, 0x00005050)
+        await tqv.write_word_reg(0x10, 0x50505050)
+        
+        await tqv.write_word_reg(0x14, 0x00006060)
+        await tqv.write_word_reg(0x10, 0x60606060)
+        
+        await tqv.write_word_reg(0x14, 0x00007070)
+        await tqv.write_word_reg(0x10, 0x70707070)
+        
+        await tqv.write_word_reg(0x14, 0x00008080)
+        await tqv.write_word_reg(0x10, 0x80808080)
 
     # Wait for two clock cycles to see the output values, because ui_in is synchronized over two clocks,
     # and a further clock is required for the output to propagate.

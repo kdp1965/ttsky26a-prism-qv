@@ -77,6 +77,7 @@ module tqvp_prism (
 );
 
     localparam  OUTPUTS = 11;
+    localparam  DEPTH   = 16;
 
     localparam  OUT_LATCH2          = 2;
     localparam  OUT_LOAD4           = 4;
@@ -196,6 +197,7 @@ module tqvp_prism (
     // =============================================================
     prism
     #(
+        .DEPTH   ( DEPTH   ),
         .OUTPUTS ( OUTPUTS )
      )
     i_prism
