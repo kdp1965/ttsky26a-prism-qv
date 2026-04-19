@@ -296,6 +296,7 @@ module tqvp_prism (
                                 ui_in[7], latched_out,
                                 2'h0, latch3, count2_dec, fifo_24, shift_24_en, shift_dir, shift_en,
                                 latch_in_out, load4, cond_out_sel, shift_out_sel, shift_in_sel};
+            6'h1:    data_out = {    3'd1,   3'd2,    6'd32,   6'd24,  6'd32,     2'h3,  3'h5,   3'h3};
             6'h18:   data_out = {6'h0, host_in, 2'h0, fifo_rd_ptr, fifo_wr_ptr, fifo_full, fifo_empty, fifo_rd_data, comm_data};
             6'h19:   data_out = {24'h0, fifo_rd_data};
             6'h1A:   data_out = {24'h0, fifo_count, fifo_rd_ptr, fifo_wr_ptr, fifo_full, fifo_empty};

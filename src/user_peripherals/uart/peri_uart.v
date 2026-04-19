@@ -81,17 +81,6 @@ module tqvp_uart_wrapper #(parameter
     wire uart_rxd = rxd_select ? ui_in[3] : ui_in[7];
     wire uart_rts;
 
-    tqvp_uart_rx i_uart_rx(
-        .clk(clk),
-        .resetn(rst_n),
-        .uart_rxd(uart_rxd),
-        .uart_rts(uart_rts),
-        .uart_rx_read(!uart_rx_buffered),
-        .uart_rx_valid(uart_rx_valid),
-        .uart_rx_data(uart_rx_data),
-        .baud_divider(baud_divider) 
-    );
-
     // Buffer one byte of received data
     reg uart_rx_buffered;
     reg [7:0] uart_rx_buf_data;
@@ -110,6 +99,17 @@ module tqvp_uart_wrapper #(parameter
             end
         end
     end
+
+    tqvp_uart_rx i_uart_rx(
+        .clk(clk),
+        .resetn(rst_n),
+        .uart_rxd(uart_rxd),
+        .uart_rts(uart_rts),
+        .uart_rx_read(!uart_rx_buffered),
+        .uart_rx_valid(uart_rx_valid),
+        .uart_rx_data(uart_rx_data),
+        .baud_divider(baud_divider) 
+    );
 
     // Interrupt on byte available
     assign user_interrupt[0] = uart_rx_buffered;

@@ -2,105 +2,22 @@
 import cocotb
 from cocotb.clock import Clock
 from cocotb.triggers import ClockCycles, RisingEdge, FallingEdge, Edge
+from user_peripherals.prism.chroma_ws2812 import *
+from user_peripherals.prism.chroma_spislave import *
+from user_peripherals.prism.chroma_encoder import *
+from user_peripherals.prism.chroma_gpio24 import *
+from user_peripherals.prism.encoder import *
 
 from tqv import TinyQV
 
 PERIPHERAL_NUM = 8
-
-'''
-==============================================================
-PRISM Downloadable Configuration
-
-Input:    chroma_gpio24.sv
-Config:   tinyqv.cfg
-==============================================================
-'''
-chroma_gpio24 = [
-   0x00ffff00, 0x00000000, 0x00000200, 0x00000000, 
-   0x00ffff00, 0x00000000, 0x00000200, 0x00000000, 
-   0x00ffff00, 0x00000000, 0x00000200, 0x00000000, 
-   0x00ffff00, 0x00000000, 0x00000200, 0x00000000, 
-   0x00ffff00, 0x00000000, 0x00000200, 0x00000000, 
-   0x00ffff00, 0x00000000, 0x00000200, 0x00000000, 
-   0x00ffff00, 0x00000000, 0x00000200, 0x00000000, 
-   0x00ffff00, 0x00000000, 0x00000200, 0x00000000, 
-   0x00ffff00, 0x00000000, 0x00000200, 0x00000000, 
-   0x00ffff00, 0x00000000, 0x00000200, 0x00000000, 
-   0x00ffff00, 0x00000000, 0x00000200, 0x00000000, 
-   0x00ffff00, 0x00000000, 0x00000200, 0x00000000, 
-   0x00ffff00, 0x00000000, 0x00000200, 0x00000000, 
-   0x00ffff00, 0x00000000, 0x00000200, 0x00000000, 
-   0x00ffff00, 0x00000000, 0x00000200, 0x00000000, 
-   0x00ffff00, 0x00000000, 0x00000200, 0x00000000, 
-   0x00ffff00, 0x00000000, 0x00000200, 0x00000000, 
-   0x00ffff00, 0x00000000, 0x00000200, 0x00000000, 
-   0x00ffff00, 0x00000000, 0x00000200, 0x00000000, 
-   0x00ffff00, 0x00000000, 0x00000200, 0x00000000, 
-   0x00ffff00, 0x00000000, 0x00000200, 0x00000000, 
-   0x00ffff00, 0x00000000, 0x00000200, 0x00000000, 
-   0x00ffff00, 0x00000000, 0x00000200, 0x00000000, 
-   0x00ffff00, 0x00000000, 0x00000200, 0x00000000, 
-   0x00ffff00, 0x00000000, 0x00000200, 0x00000000, 
-   0x00ffff00, 0x00000000, 0x00000200, 0x00000000, 
-   0x00ff5500, 0x00000000, 0x40000250, 0x00004000, 
-   0x0affff00, 0x00000000, 0x00000202, 0x80000012, 
-   0x00ff5500, 0x00000000, 0x40000241, 0x00007000, 
-   0x00ffaa00, 0x00000010, 0x40000221, 0x80006800, 
-   0x00ffff00, 0x00000000, 0x00000201, 0x00000000, 
-   0x00ffaa00, 0x00000000, 0x40020000, 0x80004000, 
-]
-chroma_gpio24_ctrlReg = 0x000005D4
-
-'''
-==============================================================
-PRISM Downloadable Configuration
-
-Input:    chroma_spislave.sv
-Config:   tinyqv.cfg
-==============================================================
-'''
-chroma_spislave = [
-   0x0affff00, 0x00000000, 0x00000000, 0x0000001a, 
-   0x0affff00, 0x00000000, 0x00000000, 0x0000001a, 
-   0x0affff00, 0x00000000, 0x00000000, 0x0000001a, 
-   0x0affff00, 0x00000000, 0x00000000, 0x0000001a, 
-   0x0affff00, 0x00000000, 0x00000000, 0x0000001a, 
-   0x0affff00, 0x00000000, 0x00000000, 0x0000001a, 
-   0x0affff00, 0x00000000, 0x00000000, 0x0000001a, 
-   0x0affff00, 0x00000000, 0x00000000, 0x0000001a, 
-   0x0affff00, 0x00000000, 0x00000000, 0x0000001a, 
-   0x0affff00, 0x00000000, 0x00000000, 0x0000001a, 
-   0x0affff00, 0x00000000, 0x00000000, 0x0000001a, 
-   0x0affff00, 0x00000000, 0x00000000, 0x0000001a, 
-   0x0affff00, 0x00000000, 0x00000000, 0x0000001a, 
-   0x0affff00, 0x00000000, 0x00000000, 0x0000001a, 
-   0x0affff00, 0x00000000, 0x00000000, 0x0000001a, 
-   0x0affff00, 0x00000000, 0x00000000, 0x0000001a, 
-   0x0affff00, 0x00000000, 0x00000000, 0x0000001a, 
-   0x0affff00, 0x00000000, 0x00000000, 0x0000001a, 
-   0x0affff00, 0x00000000, 0x00000000, 0x0000001a, 
-   0x0affff00, 0x00000000, 0x00000000, 0x0000001a, 
-   0x0affff00, 0x00000000, 0x00000000, 0x0000001a, 
-   0x0affff00, 0x00000000, 0x00000000, 0x0000001a, 
-   0x0affff00, 0x00000000, 0x00000000, 0x0000001a, 
-   0x0affff00, 0x00000000, 0x00000000, 0x0000001a, 
-   0x0affff00, 0x00000000, 0x000e2000, 0x8000001a, 
-   0x0aff5500, 0x00000000, 0x00000071, 0x0000701a, 
-   0x0afffe00, 0x00000000, 0x00000050, 0x0000001a, 
-   0x0aff5500, 0x00000000, 0x00008053, 0x0000081a, 
-   0x0afffe00, 0x00000000, 0x00000030, 0x0000001a, 
-   0x0affaa00, 0x00000000, 0x00000832, 0x0000081a, 
-   0x0aff8800, 0x00000000, 0x00002021, 0x000e081a, 
-   0x0aff0100, 0x00000000, 0x00000000, 0x8000001a, 
-]
-chroma_spislave_ctrlReg = 0x00002952
 
 @cocotb.test()
 async def test_project(dut):
     dut._log.info("Start")
 
     # Set the clock period to 100 ns (10 MHz)
-    clock = Clock(dut.clk, 100, units="ns")
+    clock = Clock(dut.clk, 16, units="ns")
     cocotb.start_soon(clock.start())
 
     # Setup simulated external devices
@@ -109,6 +26,8 @@ async def test_project(dut):
     output_value = 0
     input_shift = input_value
     spi_data = []
+    spi_rx_data = []
+    grb = 0
     chroma = ''
     spi_transfer = False
     rx_byte = 0
@@ -128,7 +47,7 @@ async def test_project(dut):
             curr_val = int(val_str, 2)
 
             # Check for clear or clock
-            if curr_val & 2 == 0:
+            if (curr_val & 2) == 0:
                 # Load new value
                 input_shift = input_value
             elif ((prev_val ^ curr_val) & (1 << 7)) and (curr_val & (1 << 7)):
@@ -160,21 +79,19 @@ async def test_project(dut):
                 output_value = output_shift
             elif ((prev_val ^ curr_val) & (1 << 7)) and (curr_val & (1 << 7)):
                 # On shift, shift in from uo_out[3]
-                bit = int(dut.uo_out[3].value)
+                bit = int(dut.uo_out[5].value)
                 output_shift = ((output_shift << 1) | bit) & 0xFFFFFF
             prev_val = curr_val
-
 
     async def delay(clocks):
         for i in range(clocks):
             await RisingEdge(dut.clk)
 
     async def simulate_spimaster():
-        nonlocal spi_data, chroma, spi_transfer, rx_byte
+        nonlocal spi_data, spi_rx_data, chroma, spi_transfer, rx_byte
         val_str = dut.uo_out.value.binstr.replace('x', '0').replace('z', '0')
         prev_val = int(val_str, 2)
         baud = 16
-        idx  = 0
         rx_byte = 0
 
         while True:
@@ -185,35 +102,30 @@ async def test_project(dut):
             if not spi_transfer:
                continue
 
-            # Get first bit of first byte
-            next_byte = spi_data[idx]
-            idx += 1
-
-            # Set input bit
-            bit = (next_byte >> 7) & 1
-            next_byte = next_byte << 1
-            dut.ui_in[2].value = bit
-
             # Drop chip select
             dut.ui_in[0].value = 0
 
-            for b in range(8): 
-                # Pulse SCLK high
-                await delay(baud)
-                dut.ui_in[1].value = 1
+            # Send all data in spi_data
+            for next_byte in spi_data:
+                rx_byte = 0
+                for b in range(8): 
+                    # Pulse SCLK high and set next MOSI bit
+                    await delay(baud)
+                    bit = (next_byte >> 7) & 1
+                    next_byte = next_byte << 1
+                    dut.ui_in[2].value = bit
+                    dut.ui_in[1].value = 1
+                
+                    # Drive SCLK low
+                    await delay(baud)
+                    dut.ui_in[1].value = 0
+                
+                    # Read MISO line
+                    bit = dut.uo_out[2].value
+                    rx_byte = (rx_byte << 1) | bit
 
-                # Read MISO line
-                bit = dut.uo_out[2].value
-                rx_byte = (rx_byte << 1) | bit
-
-                # Drive SCLK low
-                await delay(baud)
-                dut.ui_in[1].value = 0
-
-                # Set next MOSI bit
-                bit = (next_byte >> 7) & 1
-                next_byte = next_byte << 1
-                dut.ui_in[2].value = bit
+                dut._log.info(f"    RX: {rx_byte:02X}")
+                spi_rx_data.append(rx_byte)
 
             # Raise chip select
             await delay(baud)
@@ -221,6 +133,52 @@ async def test_project(dut):
 
             # Clear spi_transfer so we don't send over and over
             spi_transfer = False;
+
+    async def simulate_ws2822_slave():
+        nonlocal chroma, grb
+        val_str = dut.uo_out.value.binstr.replace('x', '0').replace('z', '0')
+        prev_val = int(val_str, 2) & 2
+        baud = 16
+        grb  = 0
+        clk_count = 0
+        bit_count = 0;
+
+        while True:
+            # Wait for either posedge uo_out[7] (shift clk) or posedge uo_out[2] (store)
+            await RisingEdge(dut.clk)
+            if chroma != 'ws2812':
+               continue
+
+            # Keep track of the number of clocks between edges
+            clk_count += 1
+
+            # Test for change in WS2812 data line
+            val_str = dut.uo_out.value.binstr.replace('x', '0').replace('z', '0')
+            val = int(val_str, 2) & 2
+            if val == prev_val:
+               continue
+
+            # Test if the count exceeded the "reset bus" value
+            if clk_count >= 1280 and prev_val == 0:
+               clk_count = 0 
+               grb = 0
+               prev_val = val
+               continue
+            elif prev_val == 0:
+               prev_val = val
+               clk_count = 0
+               continue
+
+            # Test for transition from HIGH to LOW
+            if prev_val != 0:
+               # Shift the grb data
+               grb <<= 1
+
+               # Test for a '1' bit
+               if clk_count >= 35:
+                  grb |= 1
+
+            prev_val = val
 
     async def load_chroma(chroma, ctrl_reg):
         '''
@@ -232,20 +190,16 @@ async def test_project(dut):
         assert await tqv.read_word_reg(0x0) == 0x00000000
 
         # Now load the chroma
-        for i in range(32):
+        for i in range(8):
           # Load MSB of the control word first
-          await tqv.write_word_reg(0x1c, chroma[i * 4])
-          await tqv.write_word_reg(0x18, chroma[i * 4] + 1)
-          await tqv.write_word_reg(0x14, chroma[i * 4] + 2)
+          await tqv.write_word_reg(0x14, chroma[i * 2])
         
           # Loading LSB initates the shift
-          await tqv.write_word_reg(0x10, chroma[i * 4 +3])
+          await tqv.write_word_reg(0x10, chroma[i * 2 +1])
         
         # Validate the shift operation succeeded
-        assert await tqv.read_word_reg(0x1c) == chroma[0]
-        assert await tqv.read_word_reg(0x18) == chroma[1]
-        assert await tqv.read_word_reg(0x14) == chroma[2]
-        assert await tqv.read_word_reg(0x10) == chroma[3]
+        assert await tqv.read_word_reg(0x14) == chroma[0]
+        assert await tqv.read_word_reg(0x10) == chroma[1]
         
         # Now program the PRISM peripheral configuration registers
         await tqv.write_word_reg(0x0, ctrl_reg)
@@ -264,6 +218,7 @@ async def test_project(dut):
         
         # Set an input value in the testbench
         input_value = 0x00BEEF
+        dut.ui_in[0].value = 0
 
         chroma = 'gpio24'
 
@@ -272,8 +227,8 @@ async def test_project(dut):
         
         # Start a transfer
         dut._log.info(f"    Starting GPIO24 shift operation")
-        await tqv.write_word_reg(0x28, 0x03000000)
-        await tqv.write_word_reg(0x28, 0x02000000)
+        await tqv.write_word_reg(0x18, 0x03000000)
+        await tqv.write_word_reg(0x18, 0x02000000)
 
         # Delay a bit to give FSM time to break
         for i in range(40):
@@ -309,7 +264,7 @@ async def test_project(dut):
         assert output_value == 0x00F05077
 
     async def test_chroma_spislave():
-        nonlocal spi_data, chroma, spi_transfer
+        nonlocal spi_data, spi_rx_data, chroma, spi_transfer
 
         # Reset PRISM
         await tqv.write_word_reg(0x00, 0x00000000)
@@ -324,11 +279,11 @@ async def test_project(dut):
         await load_chroma(chroma_spislave, chroma_spislave_ctrlReg)
         
         # Put 24-bit OUTPUT data in the 24-bit Shift register
-        spi_data = [0xF5]
+        spi_data = [0xF5, 0x27]
         chroma = 'spislave'
 
-        # Write a known byte to comm_data register
-        await tqv.write_byte_reg(0x28, 0x67)
+        # Write a known byte to count1_preload register
+        await tqv.write_word_reg(0x20, 0xF367)
         
         # Start a transfer
         spi_transfer = True 
@@ -342,16 +297,111 @@ async def test_project(dut):
 
         # Read a byte from the FIFO
         dut._log.info(f"    Testing read byte from FIFO")
-        assert await tqv.read_byte_reg(0x29) == 0xF5
+        assert await tqv.read_byte_reg(0x19) == 0xF5
+        assert await tqv.read_byte_reg(0x19) == 0x27
+
+        # Test if we received the bytes we expected
+        assert spi_rx_data[0] == 0x67
+        assert spi_rx_data[1] == 0xF3
 
         # Test if the interrupt was set
         dut._log.info(f"    Testing if Interrupt was set")
         assert await tqv.read_word_reg(0) & 0x80000000 != 0
 
+    # ===================================================================================
+    # Test the WS2812 Chroma
+    # ===================================================================================
+    async def test_chroma_ws2812():
+        nonlocal input_value, chroma
+
+        # Reset PRISM
+        await tqv.write_word_reg(0x00, 0x00000000)
+        chroma = ''
+
+        await tqv.write_byte_reg(0x1b, 0x00)
+        await load_chroma(chroma_ws2812, chroma_ws2812_ctrlReg)
+
+        # Program the count2_compare with 0.8uS count (64Mhz / 1.25Mhz = 51)
+        await tqv.write_byte_reg(0x28, 51)
+
+        # Program the comm_data register with 0.4uS count (64Mhz /2.5Mhz = 26)
+        await tqv.write_byte_reg(0x18, 26)
+
+        # Program count1_preload register with GRB data to send
+        await tqv.write_word_reg(0x20, 0x00FF5367)
+
+        chroma = 'ws2812'
+
+        # Set host bit 0 to start transfer
+        await tqv.write_byte_reg(0x1b, 0x01)
+
+        for i in range(6000):
+            await RisingEdge(dut.clk)
+
+        # Test if the interrupt was set
+        dut._log.info(f"    Testing if Interrupt was set")
+        assert await tqv.read_word_reg(0) & 0x80000000 != 0
+
+        # Test if data was received
+        assert grb == 0xFF5367
+
+        # Write new data using auto-toggle of host_in[0]
+        dut._log.info(f"    Writing new data using auto-toggle")
+        await tqv.write_word_reg(0x21, 0x0036FE0C)
+
+        dut._log.info(f"    Testing if Interrupt was cleared")
+        assert await tqv.read_word_reg(0) & 0x80000000 != 0
+
+        dut._log.info(f"    Testing if host_in[0] toggled")
+        assert await tqv.read_byte_reg(0x1b) == 0
+
+    # ===================================================================================
+    # Test the Encoder Chroma
+    # ===================================================================================
+    async def test_chroma_encoder(clocks_per_phase, encoder0):
+        nonlocal input_value, chroma
+
+        # Reset PRISM
+        await tqv.write_word_reg(0x00, 0x00000000)
+        chroma = ''
+
+        await tqv.write_byte_reg(0x1b, 0x00)
+        await load_chroma(chroma_encoder, chroma_encoder_ctrlReg)
+
+        # Program the count1_preload with debounce count (128 for shorter test)
+        await tqv.write_byte_reg(0x20, 128)
+
+        # Not really needed, but for completeness
+        chroma = 'encoder'
+
+        # twist the encoder knob
+        dut._log.info("    Checking encoder 0")
+        for i in range(clocks_per_phase * 2 * 20):
+            await encoder0.update(1)
+
+        # Read the count2 count
+        dut._log.info("    Testing count2 value")
+        count = await tqv.read_word_reg(0x24) >> 24
+        assert count == 20
+
+        # twist the encoder knob the other way
+        dut._log.info("    Checking encoder 0")
+        for i in range(clocks_per_phase * 2 * 12):
+            await encoder0.update(-1)
+
+        dut._log.info("    Testing count2 value")
+        count = await tqv.read_word_reg(0x24) >> 24
+        assert count == 9
+
+        
     # Start the simulations
     cocotb.start_soon(simulate_74165())
     cocotb.start_soon(simulate_74595())
     cocotb.start_soon(simulate_spimaster())
+    cocotb.start_soon(simulate_ws2822_slave())
+
+    clocks_per_phase = 600 
+    encoder0 = Encoder(dut.clk, dut.ui_in[0], dut.ui_in[1], clocks_per_phase = clocks_per_phase, noise_cycles = clocks_per_phase / 8)
 
     # Interact with your design's registers through this TinyQV class.
     # This will allow the same test to be run when your design is integrated
@@ -365,17 +415,17 @@ async def test_project(dut):
 
     dut._log.info("Testing PRISM")
 
-    # Read the PRISM config info and verify
-    assert await tqv.read_word_reg(0x01) == 0x2A0620EB
-
     # Write values to the count2_compare / count1_preload
     await tqv.write_word_reg(0x00, 0x40000000)
     await ClockCycles(dut.clk, 8)
-    await tqv.write_word_reg(0x20, 0x0300FA12)
+    await tqv.write_word_reg(0x20, 0x0000FA12)
+    await ClockCycles(dut.clk, 8)
+    await tqv.write_word_reg(0x28, 0x00000034)
     await ClockCycles(dut.clk, 8)
 
     dut._log.info("Testing basic control and latch register access")
-    assert await tqv.read_word_reg(0x20) == 0x0300FA12
+    assert await tqv.read_word_reg(0x28) == 0x00000034
+    assert await tqv.read_word_reg(0x20) == 0x0000FA12
     assert await tqv.read_word_reg(0x0) == 0x40000000
 
     await tqv.write_word_reg(0x00, 0x00000000)
@@ -383,16 +433,29 @@ async def test_project(dut):
     # Test register write and read back
     # Write a value to the config array 
     dut._log.info("Testing PRISM state information integrity")
-    val = 0x10101010
-    for x in range(32):
-      await tqv.write_word_reg(0x1c, val)
-      await tqv.write_word_reg(0x18, val)
-      await tqv.write_word_reg(0x14, val)
-      await tqv.write_word_reg(0x10, val)
+    await tqv.write_word_reg(0x14, 0x00001010)
+    await tqv.write_word_reg(0x10, 0x10101010)
 
-      await ClockCycles(dut.clk, 32*3)
+    await tqv.write_word_reg(0x14, 0x00002020)
+    await tqv.write_word_reg(0x10, 0x20202020)
 
-      val += 0x10101010
+    await tqv.write_word_reg(0x14, 0x00003030)
+    await tqv.write_word_reg(0x10, 0x30303030)
+
+    await tqv.write_word_reg(0x14, 0x00004040)
+    await tqv.write_word_reg(0x10, 0x40404040)
+
+    await tqv.write_word_reg(0x14, 0x00005050)
+    await tqv.write_word_reg(0x10, 0x50505050)
+
+    await tqv.write_word_reg(0x14, 0x00006060)
+    await tqv.write_word_reg(0x10, 0x60606060)
+
+    await tqv.write_word_reg(0x14, 0x00007070)
+    await tqv.write_word_reg(0x10, 0x70707070)
+
+    await tqv.write_word_reg(0x14, 0x00008080)
+    await tqv.write_word_reg(0x10, 0x80808080)
 
     # Wait for two clock cycles to see the output values, because ui_in is synchronized over two clocks,
     # and a further clock is required for the output to propagate.
@@ -405,6 +468,13 @@ async def test_project(dut):
     # Okay, now load up a real design and see if it does anything
     # This is the 24-Bit GPIO Chroma
     # ===========================================================
+    
+    dut._log.info("Testing encoder Chroma")
+    await test_chroma_encoder(clocks_per_phase, encoder0)
+
+    dut._log.info("Testing ws2812 Chroma")
+    await test_chroma_ws2812()
+
     dut._log.info("Testing gpio24 Chroma")
     await test_chroma_gpio24()
  
