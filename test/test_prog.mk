@@ -24,8 +24,6 @@ COMPILE_ARGS 		+= -DSIM
 COMPILE_ARGS 		+= -DPURE_RTL
 COMPILE_ARGS 		+= -I$(SRC_DIR)
 COMPILE_ARGS 		+= -I$(addprefix $(SRC_DIR)/,user_peripherals/pwl_synth)
-VERILOG_SOURCES += $(PDK_ROOT)/sky130A/libs.ref/sky130_fd_sc_hd/verilog/primitives.v
-VERILOG_SOURCES += $(PDK_ROOT)/sky130A/libs.ref/sky130_fd_sc_hd/verilog/sky130_fd_sc_hd.v
 
 else
 

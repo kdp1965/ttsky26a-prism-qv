@@ -44,6 +44,9 @@ module tt_um_prism_qv (
                       qspi_clk_out, qspi_data_out[1:0], qspi_flash_select};
     assign uio_oe_c = rst_n ? {2'b11, qspi_data_oe[3:2], 1'b1, qspi_data_oe[1:0], 1'b1} : 8'h00;
 
+`ifdef SIM
+    assign uio_oe = uio_oe_c;
+`else
     generate
         genvar i;
         for (i = 0; i < 8; i = i + 1) begin : GEN_UIO_OE
@@ -57,6 +60,7 @@ module tt_um_prism_qv (
             /* verilator lint_on PINMISSING */
         end
     endgenerate
+`endif
 
     wire [27:0] addr;
     wire  [1:0] write_n;
