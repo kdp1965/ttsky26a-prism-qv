@@ -39,9 +39,24 @@ module tt_um_prism_qv (
     wire       qspi_flash_select;
     wire       qspi_ram_a_select;
     wire       qspi_ram_b_select;
+    wire [7:0] uio_oe_c;
     assign uio_out = {qspi_ram_b_select, qspi_ram_a_select, qspi_data_out[3:2], 
                       qspi_clk_out, qspi_data_out[1:0], qspi_flash_select};
-    assign uio_oe = rst_n ? {2'b11, qspi_data_oe[3:2], 1'b1, qspi_data_oe[1:0], 1'b1} : 8'h00;
+    assign uio_oe_c = rst_n ? {2'b11, qspi_data_oe[3:2], 1'b1, qspi_data_oe[1:0], 1'b1} : 8'h00;
+
+    generate
+        genvar i;
+        for (i = 0; i < 8; i = i + 1) begin : GEN_UIO_OE
+            /* verilator lint_off PINMISSING */
+            (* keep = "true" *)
+            sky130_fd_sc_hd__and2_1 oe_and (
+                .A ( uio_oe_c[i] ),
+                .B ( uio_oe_c[i] ),
+                .X ( uio_oe[i] )
+            );
+            /* verilator lint_on PINMISSING */
+        end
+    endgenerate
 
     wire [27:0] addr;
     wire  [1:0] write_n;
